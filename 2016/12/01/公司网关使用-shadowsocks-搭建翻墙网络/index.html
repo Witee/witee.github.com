@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="dns-prefetch" href="http://witee.github.io">
+  <title>原创：使用 shadowsocks + dnsmasq + ipset + iptables 实现公办网络透明代理（智能翻墙） | Witee&#39;s Blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="update:根据 《中华人民共和国网络安全法》的相关规定，“翻墙”是违法行为，本文仅作为学习、交流使用。   网上大多数写的都是关于 openWRT 路由器关于 shadowsocks 的配置，我这里写的是关于办公网络的配置，希望对大家有所帮助。   所用到的软件  shadowsocks : https://github.com/shadowsocks/shadowsocks-libev">
+<meta name="keywords" content="shadowsocks,dnsmasq,ipset,iptables,翻墙,google">
+<meta property="og:type" content="article">
+<meta property="og:title" content="原创：使用 shadowsocks + dnsmasq + ipset + iptables 实现公办网络透明代理（智能翻墙）">
+<meta property="og:url" content="http://witee.github.io/2016/12/01/公司网关使用-shadowsocks-搭建翻墙网络/index.html">
+<meta property="og:site_name" content="Witee&#39;s Blog">
+<meta property="og:description" content="update:根据 《中华人民共和国网络安全法》的相关规定，“翻墙”是违法行为，本文仅作为学习、交流使用。   网上大多数写的都是关于 openWRT 路由器关于 shadowsocks 的配置，我这里写的是关于办公网络的配置，希望对大家有所帮助。   所用到的软件  shadowsocks : https://github.com/shadowsocks/shadowsocks-libev">
+<meta property="og:locale" content="zh">
+<meta property="og:image" content="https://github.com/Witee/shadowsocks/blob/master/imgs/tuopu1.png">
+<meta property="og:image" content="https://github.com/Witee/shadowsocks/blob/master/imgs/iptables.png">
+<meta property="og:image" content="https://github.com/Witee/shadowsocks/blob/master/imgs/tuopu2.png">
+<meta property="og:updated_time" content="2019-01-24T01:49:35.480Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="原创：使用 shadowsocks + dnsmasq + ipset + iptables 实现公办网络透明代理（智能翻墙）">
+<meta name="twitter:description" content="update:根据 《中华人民共和国网络安全法》的相关规定，“翻墙”是违法行为，本文仅作为学习、交流使用。   网上大多数写的都是关于 openWRT 路由器关于 shadowsocks 的配置，我这里写的是关于办公网络的配置，希望对大家有所帮助。   所用到的软件  shadowsocks : https://github.com/shadowsocks/shadowsocks-libev">
+<meta name="twitter:image" content="https://github.com/Witee/shadowsocks/blob/master/imgs/tuopu1.png">
+  
+    <link rel="alternative" href="/atom.xml" title="Witee&#39;s Blog" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="https://raw.githubusercontent.com/Witee/statics/master/blog/github.png">
+  
+  <link rel="stylesheet" href="/main.css">
+  
+
+</head>
+</html>
+<body>
+  <div id="container">
+    <div class="left-col">
+      <div class="overlay"></div>
+<div class="intrude-less">
+	<header id="header" class="inner">
+		<a href="/" class="profilepic">
+			
+			<img src="https://raw.githubusercontent.com/Witee/statics/master/blog/touxiang.jpg" class="js-avatar">
+			
+		</a>
+
+		<hgroup>
+		  <h1 class="header-author"><a href="/">Witee</a></h1>
+		</hgroup>
+
+		
+		<p class="header-subtitle">努力成为全栈工程师!</p>
+		
+
+		<nav class="header-menu">
+			<ul>
+			
+				<li><a href="/">主页</a></li>
+	        
+				<li><a href="/archives">所有文章</a></li>
+	        
+			</ul>
+		</nav>
+		<nav class="header-smart-menu">
+	        
+    		
+    			
+            
+    			
+            
+    			
+            
+    			
+            
+		</nav>
+		<nav class="header-nav">
+			<div class="social">
+				
+					<a class="github" target="_blank" href="https://github.com/witee" title="github"><i class="icon-github"></i></a>
+		        
+					<a class="weibo" target="_blank" href="http://weibo.com/witee" title="weibo"><i class="icon-weibo"></i></a>
+		        
+					<a class="mail" target="_blank" href="mailto:525942866@qq.com" title="mail"><i class="icon-mail"></i></a>
+		        
+			</div>
+		</nav>
+	</header>		
+</div>
+
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+  	<div class="overlay">
+  		<div class="slider-trigger"><i class="icon-sort"></i></div>
+  		<h1 class="header-author js-mobile-header hide">Witee</h1>
+  	</div>
+	<div class="intrude-less">
+		<header id="header" class="inner">
+			<div class="profilepic">
+				
+					<img src="https://raw.githubusercontent.com/Witee/statics/master/blog/touxiang.jpg" class="js-avatar">
+				
+			</div>
+			<hgroup>
+			  <h1 class="header-author">Witee</h1>
+			</hgroup>
+			
+			<p class="header-subtitle">努力成为全栈工程师!</p>
+			
+			<nav class="header-menu">
+				<ul>
+				
+					<li><a href="/">主页</a></li>
+		        
+					<li><a href="/archives">所有文章</a></li>
+		        
+				</ul>
+			</nav>
+			<nav class="header-nav">
+				<div class="social">
+					
+						<a class="github" target="_blank" href="https://github.com/witee" title="github"><i class="icon-github"></i></a>
+			        
+						<a class="weibo" target="_blank" href="http://weibo.com/witee" title="weibo"><i class="icon-weibo"></i></a>
+			        
+						<a class="mail" target="_blank" href="mailto:525942866@qq.com" title="mail"><i class="icon-mail"></i></a>
+			        
+				</div>
+			</nav>
+		</header>				
+	</div>
+</nav>
+
+      <div class="body-wrap">
+        <article id="post-公司网关使用-shadowsocks-搭建翻墙网络" class="article article-type-post" itemscope="" itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      原创：使用 shadowsocks + dnsmasq + ipset + iptables 实现公办网络透明代理（智能翻墙）
+    </h1>
+  
+
+        <a href="/2016/12/01/公司网关使用-shadowsocks-搭建翻墙网络/" class="archive-article-date">
+  	<time datetime="2016-12-01T05:09:13.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2016-12-01</time>
+</a>
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <blockquote>
+<p>update:<br>根据 《中华人民共和国网络安全法》的相关规定，“翻墙”是违法行为，本文仅作为学习、交流使用。</p>
+</blockquote>
+<blockquote>
+<p>网上大多数写的都是关于 <code>openWRT</code> 路由器关于 <code>shadowsocks</code> 的配置，<br>我这里写的是关于办公网络的配置，希望对大家有所帮助。</p>
+</blockquote>
+<ul>
+<li><p>所用到的软件</p>
+<ul>
+<li><p><code>shadowsocks</code> : <a href="https://github.com/shadowsocks/shadowsocks-libev" target="_blank" rel="noopener">https://github.com/shadowsocks/shadowsocks-libev</a></p>
+</li>
+<li><p><code>dnsmasq</code>: <a href="http://www.thekelleys.org.uk/dnsmasq/doc.html" target="_blank" rel="noopener">http://www.thekelleys.org.uk/dnsmasq/doc.html</a></p>
+</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li><p>网络拓扑</p>
+<p>  <img src="https://github.com/Witee/shadowsocks/blob/master/imgs/tuopu1.png" alt="images"></p>
+</li>
+</ul>
+<ul>
+<li><p>网关服务器有两块网卡，<code>eth1</code>为内网，<code>eth0</code>为外网，通过<code>iptables nat</code>转发将内网包转发到外网，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">-A POSTROUTING ! -s 192.168.2.1/32 -j SNAT --to-source xxx.xxx.xxx.xxx</span><br></pre></td></tr></table></figure>
+<p>以下是 <code>iptables</code> 相关表与链的图，帮助理解 <code>iptables</code> 的设置:</p>
+<p><img src="https://github.com/Witee/shadowsocks/blob/master/imgs/iptables.png" alt="iptables"></p>
+</li>
+</ul>
+<ul>
+<li>网关安装 <code>dnsmasq</code> 提供本地dns服务</li>
+</ul>
+<ul>
+<li><p>通过代理服务器访问国外网站的结构图</p>
+<p><img src="https://github.com/Witee/shadowsocks/blob/master/imgs/tuopu2.png" alt="tuopu2"></p>
+</li>
+</ul>
+<ul>
+<li><p>代理服务器上安装：</p>
+<ul>
+<li><p>安装依赖包</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum install build-essential autoconf libtool openssl-devel gcc git -y</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>安装 <code>shadowsocks</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git clone https://github.com/shadowsocks/shadowsocks-libev.git  </span><br><span class="line">cd shadowsocks ; ./configure —prefix=/usr/local/shadowsocks</span><br><span class="line">make; make install; mkdir /usr/local/shadowsocks/etc/</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><code>shadowsocks</code> 配置文件，<code>ss-local</code>、<code>ss-server</code>、<code>ss-redir</code> 都是同样的配置</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">cat /usr/local/shadowsocks/etc/config.json</span><br><span class="line">&#123;</span><br><span class="line">  &quot;server&quot;:”your.server.ip.x&quot;,</span><br><span class="line">  &quot;server_port”:1194,</span><br><span class="line">  &quot;local_port&quot;:1080,</span><br><span class="line">  &quot;password”:”your_passwd&quot;,</span><br><span class="line">  &quot;timeout&quot;:600,</span><br><span class="line">  &quot;method&quot;:&quot;aes-256-cfb&quot;</span><br><span class="line">&#125;</span><br><span class="line">解释：</span><br><span class="line">    &quot;server&quot;:&quot;[服务器IP地址]&quot;,</span><br><span class="line">    &quot;server_port&quot;:[服务器端口],</span><br><span class="line">    &quot;local_port&quot;:[本地端口],</span><br><span class="line">    &quot;password&quot;:&quot;[密码]&quot;,</span><br><span class="line">    &quot;timeout&quot;:600,</span><br><span class="line">    &quot;method&quot;:&quot;[加密方式]&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>启动脚本</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost ~]# cat /etc/init.d/shadowsocks</span><br><span class="line"></span><br><span class="line">start() &#123;</span><br><span class="line">    echo &quot;Starting ss-server...&quot;</span><br><span class="line">    /usr/bin/nohup /usr/local/shadowsocks/bin/ss-server -c /usr/local/shadowsocks/etc/config.json &gt;&gt;/tmp/shadowsock.log 2&gt;&amp;1 &amp;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line">stop() &#123;</span><br><span class="line">    echo &quot;Stopping ss-server...&quot;</span><br><span class="line">    killall ss-server</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">case $1 in</span><br><span class="line">        start)</span><br><span class="line">     start</span><br><span class="line">     ;;</span><br><span class="line">     stop)</span><br><span class="line">     stop</span><br><span class="line">     ;;</span><br><span class="line">     *)</span><br><span class="line">     echo &quot;Usage : $0 start|stop&quot;</span><br><span class="line">     ;;</span><br><span class="line">esac</span><br><span class="line"></span><br><span class="line">chmod 755 /etc/init.d/shadowsocks</span><br><span class="line">/etc/init.d/shadowsocks start</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+<li><p>网关服务器上安装：</p>
+<ul>
+<li><p><code>shadowsocks</code>安装方法同上，配置文件一致，启动脚本有所修改：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost ~]# cat /etc/init.d/shadowsocks</span><br><span class="line"> #!/bin/bash</span><br><span class="line"></span><br><span class="line">start() &#123;</span><br><span class="line">    echo &quot;Starting ss-redir...&quot;</span><br><span class="line">    /usr/bin/nohup /usr/local/shadowsocks/bin/ss-redir -c /usr/local/shadowsocks/etc/config.json &gt;&gt;/tmp/shadowsock.log 2&gt;&amp;1 &amp;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line">stop() &#123;</span><br><span class="line">    echo &quot;Stopping ss-redir...&quot;</span><br><span class="line">    killall ss-redir</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">case $1 in</span><br><span class="line">        start)</span><br><span class="line">     start</span><br><span class="line">     ;;</span><br><span class="line">     stop)</span><br><span class="line">     stop</span><br><span class="line">     ;;</span><br><span class="line">     *)</span><br><span class="line">     echo &quot;Usage : $0 start|stop&quot;</span><br><span class="line">     ;;</span><br><span class="line">esac</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>网关服务器上使用的是 <code>ss-redir</code>，也就是透明代理会使用到的程序，如果只是本地用来上网的话，使用 <code>ss-local</code>。<br>到此代理服务器与网关服务器的隧道就建立好了。</p>
+</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li><p>将经过网关服务器的请求转发至本地的隧道，也就是 <code>1080</code> 端口，达到代理的目的，但是这样的话，所有的请求都会使用代理，所以要反过来做，将指定IP的请求转发至隧道。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost tmp]# cat ss-black.sh</span><br><span class="line">#!/bin/sh</span><br><span class="line"></span><br><span class="line">#create a new chain named SHADOWSOCKS</span><br><span class="line">iptables -t nat -N SHADOWSOCKS</span><br><span class="line"></span><br><span class="line">#Redirect what you want</span><br><span class="line"></span><br><span class="line">#Google</span><br><span class="line">iptables -t nat -A SHADOWSOCKS -p tcp -d 74.125.0.0/16 -j REDIRECT --to-ports 1080</span><br><span class="line">iptables -t nat -A SHADOWSOCKS -p tcp -d 173.194.0.0/16 -j REDIRECT --to-ports 1080</span><br><span class="line"></span><br><span class="line">#Youtube</span><br><span class="line">iptables -t nat -A SHADOWSOCKS -p tcp -d 208.117.224.0/19 -j REDIRECT --to-ports 1080</span><br><span class="line">iptables -t nat -A SHADOWSOCKS -p tcp -d 209.85.128.0/17 -j REDIRECT --to-ports 1080</span><br><span class="line"></span><br><span class="line">#Twitter</span><br><span class="line">iptables -t nat -A SHADOWSOCKS -p tcp -d 199.59.148.0/22 -j REDIRECT --to-ports 1080</span><br><span class="line">iptables -t nat -A SHADOWSOCKS -p tcp -d 205.164.0.0/16 -j REDIRECT --to-ports 1080</span><br><span class="line"></span><br><span class="line">#Shadowsocks.org</span><br><span class="line">iptables -t nat -A SHADOWSOCKS -p tcp -d 199.27.76.133/32 -j REDIRECT --to-ports 1080</span><br><span class="line"></span><br><span class="line">#1024</span><br><span class="line">iptables -t nat -A SHADOWSOCKS -p tcp -d 184.154.128.246/32 -j REDIRECT --to-ports 1080</span><br><span class="line"></span><br><span class="line">#Anything else should be ignore</span><br><span class="line">iptables -t nat -A SHADOWSOCKS -p tcp -j RETURN</span><br><span class="line"></span><br><span class="line"># Apply the rules</span><br><span class="line">iptables -t nat -A PREROUTING -p tcp -j SHADOWSOCKS</span><br></pre></td></tr></table></figure>
+<p>以上是网上的脚本，只有列表中的地址会使用代理。<br>但是这样就得手工维护这个地址，所以要使用更智能的方法，也就是自动获得这些IP地址。</p>
+<p>方法是：通过无污染的DNS请求域名，把解析后的IP写到列表中。</p>
+</li>
+<li><p>具体实施：</p>
+<ul>
+<li><p><code>yum install ipset</code>: <code>ipset</code> 的使用方法及 <code>ipset</code> 与 <code>iptables</code> 的关系请自行 <code>google</code></p>
+</li>
+<li><p><code>ipset -N setmefree iphash</code>:新建一个 <code>IP</code> 的池子，通过 <code>ipset list</code> 命令可以查到池中的 <code>IP</code>，现在是空的</p>
+</li>
+<li><p>添加 <code>iptables</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">iptables -t nat -A PREROUTING -p tcp -m multiport --dports 443 -m set --match-set setmefree dst -j REDIRECT --to-ports 1080</span><br><span class="line">iptables -t nat -A PREROUTING -p tcp -m multiport --dports 80 -m set --match-set setmefree dst -j REDIRECT --to-ports 1080</span><br><span class="line">iptables -t nat -A PREROUTING -p tcp -j RETURN</span><br></pre></td></tr></table></figure>
+<p>将 <code>tcp</code> 请求的 <code>80 443</code> 端口并且是在池中的目的地址转发至 <code>1080</code> 端口（使用代理）；其它不使用代理。<br>其中 <code>setmefree</code> 名称要与 <code>ipset -N</code> 时使用的名称一致。</p>
+</li>
+<li><p>现在池中的地址是空的，所以不会请求通过代理，可以手工添加，方法为：<code>ipset -A setmefree ip/mask</code> ，<br>然后 <code>ipset list</code> 就可以看到了，但这个方法还是很不智能，所以要配合 <code>dnsmasq</code> 来自动添加 <code>IP</code> 地址到池中。</p>
+</li>
+<li><p>具体方法：</p>
+<p>  从官网下载 <code>dnsmasq</code> 源码包并安装，不能直接 <code>yum</code> 安装，因为 <code>yum</code> 装的不会支持 <code>ipset</code>，<br>  编写文档时 <code>dnsmasq</code> 的版本是：<code>dnsmasq-2.72.tar.gz</code> 如无重大更新，请下载最新版本。</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tar -zxf dnsmasq-2.72.tar.gz; cd dnsmasq-2.72</span><br></pre></td></tr></table></figure>
+<p> 安装方法在此文件夹的 <code>setup.html</code> 中，也就是直接 <code>make install</code> ,<br> 会把程序安装到 <code>/usr/local/sbin/dnsmasq</code> ，然后 <code>cp dnsmasq.conf.example /etc/dnsmasq.conf</code>;<br> 直接执行 <code>dnsmasq</code> 就可以直接启动，配置文件读取 <code>/etc/dnsmasq.conf</code> ，<br> 配置文件中打开并指定文件 <code>conf-file=/etc/dnsmasq.d/xxx.conf</code><br> 修改 <code>xxx.conf</code> 内容为：</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br></pre></td><td class="code"><pre><span class="line">#Google and Youtube</span><br><span class="line">server=/.google.com/208.67.222.222#443</span><br><span class="line">server=/.google.com.hk/208.67.222.222#443</span><br><span class="line">server=/.gstatic.com/208.67.222.222#443</span><br><span class="line">server=/.ggpht.com/208.67.222.222#443</span><br><span class="line">server=/.googleusercontent.com/208.67.222.222#443</span><br><span class="line">server=/.appspot.com/208.67.222.222#443</span><br><span class="line">server=/.googlecode.com/208.67.222.222#443</span><br><span class="line">server=/.googleapis.com/208.67.222.222#443</span><br><span class="line">server=/.gmail.com/208.67.222.222#443</span><br><span class="line">server=/.google-analytics.com/208.67.222.222#443</span><br><span class="line">server=/.youtube.com/208.67.222.222#443</span><br><span class="line">server=/.googlevideo.com/208.67.222.222#443</span><br><span class="line">server=/.youtube-nocookie.com/208.67.222.222#443</span><br><span class="line">server=/.ytimg.com/208.67.222.222#443</span><br><span class="line">server=/.blogspot.com/208.67.222.222#443</span><br><span class="line">server=/.blogger.com/208.67.222.222#443</span><br><span class="line"></span><br><span class="line">#FaceBook</span><br><span class="line">server=/.facebook.com/208.67.222.222#443</span><br><span class="line">server=/.thefacebook.com/208.67.222.222#443</span><br><span class="line">server=/.facebook.net/208.67.222.222#443</span><br><span class="line">server=/.fbcdn.net/208.67.222.222#443</span><br><span class="line">server=/.akamaihd.net/208.67.222.222#443</span><br><span class="line"></span><br><span class="line">#Twitter</span><br><span class="line">server=/.twitter.com/208.67.222.222#443</span><br><span class="line">server=/.t.co/208.67.222.222#443</span><br><span class="line">server=/.bitly.com/208.67.222.222#443</span><br><span class="line">server=/.twimg.com/208.67.222.222#443</span><br><span class="line">server=/.tinypic.com/208.67.222.222#443</span><br><span class="line">server=/.yfrog.com/208.67.222.222#443</span><br><span class="line"></span><br><span class="line">#Dropbox</span><br><span class="line">server=/.dropbox.com/208.67.222.222#443</span><br><span class="line"></span><br><span class="line">#1024</span><br><span class="line">server=/.t66y.com/208.67.222.222#443</span><br><span class="line"></span><br><span class="line">#shadowsocks.org</span><br><span class="line">server=/.shadowsocks.org/208.67.222.222#443</span><br><span class="line"></span><br><span class="line">#btdigg</span><br><span class="line">server=/.btdigg.org/208.67.222.222#443</span><br><span class="line"></span><br><span class="line">#sf.net</span><br><span class="line">server=/.sourceforge.net/208.67.222.222#443</span><br><span class="line"></span><br><span class="line">#feedly</span><br><span class="line">server=/.feedly.com/208.67.222.222#443</span><br><span class="line"></span><br><span class="line"># Here Comes The ipset</span><br><span class="line"></span><br><span class="line">#Google and Youtube</span><br><span class="line">ipset=/.google.com/setmefree</span><br><span class="line">ipset=/.google.com.hk/setmefree</span><br><span class="line">ipset=/.gstatic.com/setmefree</span><br><span class="line">ipset=/.ggpht.com/setmefree</span><br><span class="line">ipset=/.googleusercontent.com/setmefree</span><br><span class="line">ipset=/.appspot.com/setmefree</span><br><span class="line">ipset=/.googlecode.com/setmefree</span><br><span class="line">ipset=/.googleapis.com/setmefree</span><br><span class="line">ipset=/.gmail.com/setmefree</span><br><span class="line">ipset=/.google-analytics.com/setmefree</span><br><span class="line">ipset=/.youtube.com/setmefree</span><br><span class="line">ipset=/.googlevideo.com/setmefree</span><br><span class="line">ipset=/.youtube-nocookie.com/setmefree</span><br><span class="line">ipset=/.ytimg.com/setmefree</span><br><span class="line">ipset=/.blogspot.com/setmefree</span><br><span class="line">ipset=/.blogger.com/setmefree</span><br><span class="line"></span><br><span class="line">#FaceBook</span><br><span class="line">ipset=/.facebook.com/setmefree</span><br><span class="line">ipset=/.thefacebook.com/setmefree</span><br><span class="line">ipset=/.facebook.net/setmefree</span><br><span class="line">ipset=/.fbcdn.net/setmefree</span><br><span class="line">ipset=/.akamaihd.net/setmefree</span><br><span class="line"></span><br><span class="line">#Twitter</span><br><span class="line">ipset=/.twitter.com/setmefree</span><br><span class="line">ipset=/.t.co/setmefree</span><br><span class="line">ipset=/.bitly.com/setmefree</span><br><span class="line">ipset=/.twimg.com/setmefree</span><br><span class="line">ipset=/.tinypic.com/setmefree</span><br><span class="line">ipset=/.yfrog.com/setmefree</span><br><span class="line"></span><br><span class="line">#Dropbox</span><br><span class="line">ipset=/.dropbox.com/setmefree</span><br><span class="line"></span><br><span class="line">#1024</span><br><span class="line">ipset=/.t66y.com/setmefree</span><br><span class="line"></span><br><span class="line">#shadowsocks.org</span><br><span class="line">ipset=/.shadowsocks.org/setmefree</span><br><span class="line"></span><br><span class="line">#btdigg</span><br><span class="line">ipset=/.btdigg.org/setmefree</span><br><span class="line"></span><br><span class="line">#sf.net</span><br><span class="line">ipset=/.sourceforge.net/setmefree</span><br><span class="line"></span><br><span class="line">#feedly</span><br><span class="line">ipset=/.feedly.com/setmefree</span><br></pre></td></tr></table></figure>
+<p>注意 <code>server=</code> 与 <code>ipset=</code> 是一一对应的，意思就是通过 <code>dnsmasq</code> 解析出来的 <code>IP</code> 写到地址池 (<code>setmefree</code>) 中。</p>
+<p>启动 <code>dnsmasq</code>，当有访问的时候 <code>ipset list</code> 才会显示出地址，此时访问此列表中的地址的 <code>80 443</code> 端口的语法就会通过代理了。</p>
+</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li><p>注意事项</p>
+<ul>
+<li><p><code>xxx.conf</code> 中使用的 <code>dns</code> 必须是无污染的，也就是没有被强制解析到错误的地址，<code>208.67.222.222</code> 为 <code>Opendns</code>，<br>支持使用非标准端口（443,5353），据说不稳定，当不稳定的时候访问没有在列表中的域名时会不能解析出地址，<br>所以还可以在代理服务器上安装另外一个 <code>dnsmasq</code>，设置缓存大一点（<code>cache-size=1000000</code>），<br>并通过设置 <code>resolv-file=/etc/dnsmasq.resolv.conf</code> 中的 <code>opendns</code> 来解析国外 <code>IP</code>，<br>网关服务器再使用代理服务器上的 <code>dns</code> 来解析，这样如果 <code>opendns</code> 如果不稳定的时候还可以使用代理服务器上的 <code>dns</code> 缓存来解析。</p>
+</li>
+<li><p>代理服务器上安装 <code>dnsmasq</code> 方法一致，只是配置不同：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">cache-size=1000000</span><br><span class="line">resolv-file=/etc/dnsmasq.resolv.conf</span><br><span class="line"># cat  /etc/dnsmasq.resolv.conf</span><br><span class="line"># nameserver 208.67.222.222     # 但默认是使用53端口，请自行google如何使用443端口来查询</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><code>ipset list</code> 中的地址是不会自动删除的，所以最好定期执行 <code>ipset flush setmefree</code> 来清空 <code>setmefree</code> 中的 <code>IP</code>以保证都是正常的。</p>
+</li>
+<li><p>网关服务器上还可以安装 <code>squid</code> 正向代理。</p>
+</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li>至此配置完成</li>
+</ul>
+<p>如果对你有所帮助，请点击右上角的 <code>Star</code></p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags"></i>
+		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/dnsmasq/">dnsmasq</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/google/">google</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ipset/">ipset</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/iptables/">iptables</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/shadowsocks/">shadowsocks</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/翻墙/">翻墙</a></li></ul>
+	</div>
+
+      
+
+      
+
+      
+        <div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
+        </div>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode"></div>
+</div>
+
+<div class="mask js-mask"></div>
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+  
+<nav id="article-nav">
+  
+    <a href="/2016/12/01/为开源做贡献，github发布项目时的结构化仓库模板/" id="article-nav-newer" class="article-nav-link-wrap">
+      <i class="icon-circle-left"></i>
+      <div class="article-nav-title">
+        
+          为开源做贡献，github 发布项目时的结构化仓库模板
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2016/11/30/新的开始/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">新的开始</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+
+
+
+
+
+
+
+      </div>
+      <footer id="footer">
+  <div class="outer">
+    <div id="footer-info">
+    	<div class="footer-left">
+    		&copy; 2019 Witee
+    	</div>
+      	<div class="footer-right">
+          <script language="javascript" type="text/javascript" src="http://js.users.51.la/19050737.js"></script>
+          <noscript>
+            <a href="http://www.51.la/?19050737" target="_blank">
+              <img alt="&#x6211;&#x8981;&#x5566;&#x514D;&#x8D39;&#x7EDF;&#x8BA1;" src="http://img.users.51.la/19050737.asp" style="border:none">
+            </a>
+          </noscript>
+      		<a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/litten/hexo-theme-yilia" target="_blank">Yilia</a> by Litten
+      	</div>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <script>
+	var yiliaConfig = {
+		mathjax: false,
+		animate: true,
+		isHome: false,
+		isPost: true,
+		isArchive: false,
+		isTag: false,
+		isCategory: false,
+		open_in_new: false,
+		root: "/",
+		innerArchive: false
+	}
+</script>
+
+<script src="/./main.js"></script>
+
+
+    
+<div class="tools-col">
+  <ul class="btn-wrap">
+    
+    
+    
+    
+  </ul>
+  <div class="tools-wrap">
+    
+
+    
+
+    
+
+    
+  </div>
+  
+</div>
+    <!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                <!--  Controls are self-explanatory. Order can be changed. -->
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" style="display:none" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                      <div class="pswp__preloader__cut">
+                        <div class="pswp__preloader__donut"></div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div> 
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+  </div>
+</body>
+</html>

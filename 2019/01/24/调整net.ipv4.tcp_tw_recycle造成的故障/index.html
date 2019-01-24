@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="dns-prefetch" href="http://witee.github.io">
+  <title>调整 net.ipv4.tcp_tw_recycle 造成的故障 | Witee&#39;s Blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="背景   在 nat 的网络环境访问服务器时会有不定时连接超时的问题   原因  出现此问题，可能是系统参数设置问题，即以下两个参数都设置为 1 12net.ipv4.tcp_timestamps = 1net.ipv4.tcp_tw_recycle = 1  RFC1323中有如下一段描述：   An additional mechanism could be added to the TCP">
+<meta name="keywords" content="tcp,tcp_tw_recycle,tcp_timestamps">
+<meta property="og:type" content="article">
+<meta property="og:title" content="调整 net.ipv4.tcp_tw_recycle 造成的故障">
+<meta property="og:url" content="http://witee.github.io/2019/01/24/调整net.ipv4.tcp_tw_recycle造成的故障/index.html">
+<meta property="og:site_name" content="Witee&#39;s Blog">
+<meta property="og:description" content="背景   在 nat 的网络环境访问服务器时会有不定时连接超时的问题   原因  出现此问题，可能是系统参数设置问题，即以下两个参数都设置为 1 12net.ipv4.tcp_timestamps = 1net.ipv4.tcp_tw_recycle = 1  RFC1323中有如下一段描述：   An additional mechanism could be added to the TCP">
+<meta property="og:locale" content="zh">
+<meta property="og:updated_time" content="2019-01-24T01:49:35.481Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="调整 net.ipv4.tcp_tw_recycle 造成的故障">
+<meta name="twitter:description" content="背景   在 nat 的网络环境访问服务器时会有不定时连接超时的问题   原因  出现此问题，可能是系统参数设置问题，即以下两个参数都设置为 1 12net.ipv4.tcp_timestamps = 1net.ipv4.tcp_tw_recycle = 1  RFC1323中有如下一段描述：   An additional mechanism could be added to the TCP">
+  
+    <link rel="alternative" href="/atom.xml" title="Witee&#39;s Blog" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="https://raw.githubusercontent.com/Witee/statics/master/blog/github.png">
+  
+  <link rel="stylesheet" href="/main.css">
+  
+
+</head>
+</html>
+<body>
+  <div id="container">
+    <div class="left-col">
+      <div class="overlay"></div>
+<div class="intrude-less">
+	<header id="header" class="inner">
+		<a href="/" class="profilepic">
+			
+			<img src="https://raw.githubusercontent.com/Witee/statics/master/blog/touxiang.jpg" class="js-avatar">
+			
+		</a>
+
+		<hgroup>
+		  <h1 class="header-author"><a href="/">Witee</a></h1>
+		</hgroup>
+
+		
+		<p class="header-subtitle">努力成为全栈工程师!</p>
+		
+
+		<nav class="header-menu">
+			<ul>
+			
+				<li><a href="/">主页</a></li>
+	        
+				<li><a href="/archives">所有文章</a></li>
+	        
+			</ul>
+		</nav>
+		<nav class="header-smart-menu">
+	        
+    		
+    			
+            
+    			
+            
+    			
+            
+    			
+            
+		</nav>
+		<nav class="header-nav">
+			<div class="social">
+				
+					<a class="github" target="_blank" href="https://github.com/witee" title="github"><i class="icon-github"></i></a>
+		        
+					<a class="weibo" target="_blank" href="http://weibo.com/witee" title="weibo"><i class="icon-weibo"></i></a>
+		        
+					<a class="mail" target="_blank" href="mailto:525942866@qq.com" title="mail"><i class="icon-mail"></i></a>
+		        
+			</div>
+		</nav>
+	</header>		
+</div>
+
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+  	<div class="overlay">
+  		<div class="slider-trigger"><i class="icon-sort"></i></div>
+  		<h1 class="header-author js-mobile-header hide">Witee</h1>
+  	</div>
+	<div class="intrude-less">
+		<header id="header" class="inner">
+			<div class="profilepic">
+				
+					<img src="https://raw.githubusercontent.com/Witee/statics/master/blog/touxiang.jpg" class="js-avatar">
+				
+			</div>
+			<hgroup>
+			  <h1 class="header-author">Witee</h1>
+			</hgroup>
+			
+			<p class="header-subtitle">努力成为全栈工程师!</p>
+			
+			<nav class="header-menu">
+				<ul>
+				
+					<li><a href="/">主页</a></li>
+		        
+					<li><a href="/archives">所有文章</a></li>
+		        
+				</ul>
+			</nav>
+			<nav class="header-nav">
+				<div class="social">
+					
+						<a class="github" target="_blank" href="https://github.com/witee" title="github"><i class="icon-github"></i></a>
+			        
+						<a class="weibo" target="_blank" href="http://weibo.com/witee" title="weibo"><i class="icon-weibo"></i></a>
+			        
+						<a class="mail" target="_blank" href="mailto:525942866@qq.com" title="mail"><i class="icon-mail"></i></a>
+			        
+				</div>
+			</nav>
+		</header>				
+	</div>
+</nav>
+
+      <div class="body-wrap">
+        <article id="post-调整net.ipv4.tcp_tw_recycle造成的故障" class="article article-type-post" itemscope="" itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      调整 net.ipv4.tcp_tw_recycle 造成的故障
+    </h1>
+  
+
+        <a href="/2019/01/24/调整net.ipv4.tcp_tw_recycle造成的故障/" class="archive-article-date">
+  	<time datetime="2019-01-24T01:49:35.481Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-01-24</time>
+</a>
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <ul>
+<li>背景</li>
+</ul>
+<blockquote>
+<p>在 nat 的网络环境访问服务器时会有不定时连接超时的问题</p>
+</blockquote>
+<ul>
+<li>原因</li>
+</ul>
+<p>出现此问题，可能是系统参数设置问题，即以下两个参数都设置为 1</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">net.ipv4.tcp_timestamps = 1</span><br><span class="line">net.ipv4.tcp_tw_recycle = 1</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>RFC1323中有如下一段描述：</p>
+</blockquote>
+<blockquote>
+<p>An additional mechanism could be added to the TCP, a per-host cache of the last timestamp received from any connection. This value could then be used in the PAWS mechanism to reject old duplicate segments from earlier incarnations of the connection, if the timestamp clock can be guaranteed to have ticked at least once since the old connection was open. This would require that the TIME-WAIT delay plus the RTT together must be at least one tick of the sender’s timestamp clock. Such an extension is not part of the proposal of this RFC.</p>
+</blockquote>
+<blockquote>
+<p>大概意思是说TCP有一种行为，可以缓存每个主机最新的时间戳，后续请求中如果时间戳小于缓存的时间戳，即视为无效，相应的数据包会被丢弃。</p>
+</blockquote>
+<blockquote>
+<p>Linux是否启用这种行为取决于tcp_timestamps和tcp_tw_recycle，因为tcp_timestamps缺省就是开启的，所以当tcp_tw_recycle被开启后，实际上这种行为就被激活了，当客户端或服务端以NAT方式构建的时候就可能出现问题，下面以客户端NAT为例来说明：</p>
+</blockquote>
+<blockquote>
+<p>当多个客户端通过NAT方式联网并与服务端交互时，服务端看到的是同一个IP，也就是说对服务端而言这些客户端实际上等同于一个，可惜由于这些客户端的时间戳可能存在差异，于是乎从服务端的视角看，便可能出现时间戳错乱的现象，进而直接导致时间戳小的数据包被丢弃。如果发生了此类问题，具体的表现通常是是客户端明明发送的SYN，但服务端就是不响应ACK，我们可以通过下面命令来确认数据包不断被丢弃的现象：</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">shell&gt; netstat -s | grep timestamp</span><br><span class="line">... packets rejects in established connections because of timestamp</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>安全起见，通常要禁止tcp_tw_recycle。说到这里，大家可能会想到另一种解决方案：把tcp_timestamps设置为0，tcp_tw_recycle设置为1，这样不就可以鱼与熊掌兼得了么？可惜一旦关闭了tcp_timestamps，那么即便打开了tcp_tw_recycle，也没有效果。</p>
+</blockquote>
+<blockquote>
+<p>引用地址: <code>https://huoding.com/2012/01/19/142</code></p>
+</blockquote>
+<ul>
+<li><p>解决办法</p>
+<p>解决的方法就是将这两个参数修改为:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">net.ipv4.tcp_timestamps = 1</span><br><span class="line">net.ipv4.tcp_tw_recycle = 0</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>遇到的问题</p>
+<p>本来修改完成后再次请求就没有问题了，但如果是 docker 服务器的话，会发现容器中无法连接网络!</p>
+<p>因为修改 <code>net.ipv4.tcp_tw_recycle</code> 影响的是 nat 相关，所以如果容器是以 nat 方式上网的话，就会造成影响</p>
+</li>
+<li><p>解决办法</p>
+<p>解决以上问题，需要先停掉 docker 主进程，然后修改参数，再启动</p>
+</li>
+</ul>
+<p>-</p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags"></i>
+		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tcp/">tcp</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tcp-timestamps/">tcp_timestamps</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/tcp-tw-recycle/">tcp_tw_recycle</a></li></ul>
+	</div>
+
+      
+
+      
+
+      
+        <div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
+        </div>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode"></div>
+</div>
+
+<div class="mask js-mask"></div>
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+  
+<nav id="article-nav">
+  
+    <a href="/2019/01/24/CentOS6-x环境下升级内核并安装-docker/" id="article-nav-newer" class="article-nav-link-wrap">
+      <i class="icon-circle-left"></i>
+      <div class="article-nav-title">
+        
+          本文介绍在 CentOS6.x 上安装 docker
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2019/01/24/Docker-Compose安装/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">Docker Compose 安装</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+
+
+
+
+
+
+
+      </div>
+      <footer id="footer">
+  <div class="outer">
+    <div id="footer-info">
+    	<div class="footer-left">
+    		&copy; 2019 Witee
+    	</div>
+      	<div class="footer-right">
+          <script language="javascript" type="text/javascript" src="http://js.users.51.la/19050737.js"></script>
+          <noscript>
+            <a href="http://www.51.la/?19050737" target="_blank">
+              <img alt="&#x6211;&#x8981;&#x5566;&#x514D;&#x8D39;&#x7EDF;&#x8BA1;" src="http://img.users.51.la/19050737.asp" style="border:none">
+            </a>
+          </noscript>
+      		<a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/litten/hexo-theme-yilia" target="_blank">Yilia</a> by Litten
+      	</div>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <script>
+	var yiliaConfig = {
+		mathjax: false,
+		animate: true,
+		isHome: false,
+		isPost: true,
+		isArchive: false,
+		isTag: false,
+		isCategory: false,
+		open_in_new: false,
+		root: "/",
+		innerArchive: false
+	}
+</script>
+
+<script src="/./main.js"></script>
+
+
+    
+<div class="tools-col">
+  <ul class="btn-wrap">
+    
+    
+    
+    
+  </ul>
+  <div class="tools-wrap">
+    
+
+    
+
+    
+
+    
+  </div>
+  
+</div>
+    <!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                <!--  Controls are self-explanatory. Order can be changed. -->
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" style="display:none" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                      <div class="pswp__preloader__cut">
+                        <div class="pswp__preloader__donut"></div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div> 
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+  </div>
+</body>
+</html>
