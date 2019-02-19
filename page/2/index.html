@@ -131,6 +131,66 @@
       <div class="body-wrap">
         
   
+    <article id="post-解决webpack4设置全局模块找不到的问题" class="article article-type-post" itemscope="" itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/11/01/解决webpack4设置全局模块找不到的问题/">解决 webpack4 设置全局模块找不到的问题</a>
+    </h1>
+  
+
+        <a href="/2018/11/01/解决webpack4设置全局模块找不到的问题/" class="archive-article-date">
+  	<time datetime="2018-11-01T09:30:41.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-11-01</time>
+</a>
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><code>webpack4.x</code>设置全局模块使用的是 <code>ProvidePlugin</code>，其中 <code>open-js-tools</code> 是自定义的模块，已经上传至 <code>npm</code>，但在使用时提示未找到。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">new webpack.ProvidePlugin(&#123;</span><br><span class="line">  moment: &apos;moment&apos;,</span><br><span class="line">  _: &apos;lodash&apos;,</span><br><span class="line">  JsTools: &apos;open-js-tools&apos;,</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<p>原因是在导出时的设置问题，即不能添加 <code>default</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">import string from &apos;./libs/string&apos;;</span><br><span class="line"></span><br><span class="line">export.default &#123;</span><br><span class="line">  string,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>应该使用：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">import string from &apos;./libs/string&apos;;</span><br><span class="line"></span><br><span class="line">export &#123;</span><br><span class="line">  string,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>使用 <code>default</code>后，路径应该是<code>JsTools.default.string</code>。</p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags"></i>
+		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/webpack/">webpack</a></li></ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2018/11/01/解决webpack4设置全局模块找不到的问题/#more">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+
+
+
+
+
+
+
+  
     <article id="post-如何扩展antd的icon" class="article article-type-post" itemscope="" itemprop="blogPost">
   <div class="article-inner">
     
