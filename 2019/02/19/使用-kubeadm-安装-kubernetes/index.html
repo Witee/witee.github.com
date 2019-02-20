@@ -8,18 +8,18 @@
   <link rel="dns-prefetch" href="http://witee.github.io">
   <title>使用 kubeadm 安装 kubernetes(k8s) | Witee&#39;s Blog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="服务器需要可以科学上网   安装 kubeadm  官方安装文档: https://kubernetes.io/zh/docs/setup/independent/install-kubeadm/   使用阿里的YUM源 123456789cat &amp;lt;&amp;lt;EOF &amp;gt; /etc/yum.repos.d/kubernetes.repo[kubernetes]name=Kubernete">
+  <meta name="description" content="服务器需要可以科学上网   安装 kubeadm  请优先按官方安装文档安装: https://kubernetes.io/docs/setup/independent/create-cluster-kubeadm/   使用阿里的YUM源 123456789cat &amp;lt;&amp;lt;EOF &amp;gt; /etc/yum.repos.d/kubernetes.repo[kubernetes]name">
 <meta name="keywords" content="k8s,kubeadm,kubernetes">
 <meta property="og:type" content="article">
 <meta property="og:title" content="使用 kubeadm 安装 kubernetes(k8s)">
 <meta property="og:url" content="http://witee.github.io/2019/02/19/使用-kubeadm-安装-kubernetes/index.html">
 <meta property="og:site_name" content="Witee&#39;s Blog">
-<meta property="og:description" content="服务器需要可以科学上网   安装 kubeadm  官方安装文档: https://kubernetes.io/zh/docs/setup/independent/install-kubeadm/   使用阿里的YUM源 123456789cat &amp;lt;&amp;lt;EOF &amp;gt; /etc/yum.repos.d/kubernetes.repo[kubernetes]name=Kubernete">
+<meta property="og:description" content="服务器需要可以科学上网   安装 kubeadm  请优先按官方安装文档安装: https://kubernetes.io/docs/setup/independent/create-cluster-kubeadm/   使用阿里的YUM源 123456789cat &amp;lt;&amp;lt;EOF &amp;gt; /etc/yum.repos.d/kubernetes.repo[kubernetes]name">
 <meta property="og:locale" content="zh">
-<meta property="og:updated_time" content="2019-02-19T06:54:39.755Z">
+<meta property="og:updated_time" content="2019-02-20T03:09:34.183Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="使用 kubeadm 安装 kubernetes(k8s)">
-<meta name="twitter:description" content="服务器需要可以科学上网   安装 kubeadm  官方安装文档: https://kubernetes.io/zh/docs/setup/independent/install-kubeadm/   使用阿里的YUM源 123456789cat &amp;lt;&amp;lt;EOF &amp;gt; /etc/yum.repos.d/kubernetes.repo[kubernetes]name=Kubernete">
+<meta name="twitter:description" content="服务器需要可以科学上网   安装 kubeadm  请优先按官方安装文档安装: https://kubernetes.io/docs/setup/independent/create-cluster-kubeadm/   使用阿里的YUM源 123456789cat &amp;lt;&amp;lt;EOF &amp;gt; /etc/yum.repos.d/kubernetes.repo[kubernetes]name">
   
     <link rel="alternative" href="/atom.xml" title="Witee&#39;s Blog" type="application/atom+xml">
   
@@ -155,7 +155,7 @@
 <ul>
 <li><p>安装 kubeadm</p>
 <blockquote>
-<p>官方安装文档: <a href="https://kubernetes.io/zh/docs/setup/independent/install-kubeadm/" target="_blank" rel="noopener">https://kubernetes.io/zh/docs/setup/independent/install-kubeadm/</a></p>
+<p>请优先按官方安装文档安装: <a href="https://kubernetes.io/docs/setup/independent/create-cluster-kubeadm/" target="_blank" rel="noopener">https://kubernetes.io/docs/setup/independent/create-cluster-kubeadm/</a></p>
 </blockquote>
 <ul>
 <li><p>使用阿里的YUM源</p>
@@ -165,24 +165,36 @@
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"># Set SELinux in permissive mode (effectively disabling it)</span><br><span class="line">setenforce 0</span><br><span class="line">sed -i &apos;s/^SELINUX=enforcing$/SELINUX=permissive/&apos; /etc/selinux/config</span><br><span class="line"></span><br><span class="line">yum install -y kubelet kubeadm kubectl --disableexcludes=kubernetes</span><br><span class="line"></span><br><span class="line">systemctl enable --now kubelet</span><br></pre></td></tr></table></figure>
 <ul>
 <li><p>加载模块 <code>br_netfilter</code></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lsmod | grep br_netfilter # 查看是否已加载</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lsmod | grep br_netfilter # centos 7 查询不到结果，看别人文档说已经编译进了某个地方，所以这一步可跳过</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
 </li>
 </ul>
 </li>
 <li><p>安装 <code>k8s</code></p>
 <ul>
-<li><p>修改配置</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"># 把默认配置文件打印出来</span><br><span class="line">kubeadm config print init-defaults &gt;kubeadm.conf</span><br><span class="line"></span><br><span class="line"># 将 kubeadm.conf 中 imageRepository 对应的值由 k8s.gcr.io 修改为 docker.io/mirrorgooglecontainers</span><br><span class="line">[root@localhost k8s]# cat kubeadm.conf</span><br><span class="line">apiVersion: kubeadm.k8s.io/v1beta1</span><br><span class="line">bootstrapTokens:</span><br><span class="line">- groups:</span><br><span class="line">  - system:bootstrappers:kubeadm:default-node-token</span><br><span class="line">  token: abcdef.0123456789abcdef</span><br><span class="line">  ttl: 24h0m0s</span><br><span class="line">  usages:</span><br><span class="line">  - signing</span><br><span class="line">  - authentication</span><br><span class="line">kind: InitConfiguration</span><br><span class="line">localAPIEndpoint:</span><br><span class="line">  advertiseAddress: 1.2.3.4</span><br><span class="line">  bindPort: 6443</span><br><span class="line">nodeRegistration:</span><br><span class="line">  criSocket: /var/run/dockershim.sock</span><br><span class="line">  name: localhost</span><br><span class="line">  taints:</span><br><span class="line">  - effect: NoSchedule</span><br><span class="line">    key: node-role.kubernetes.io/master</span><br><span class="line">---</span><br><span class="line">apiServer:</span><br><span class="line">  timeoutForControlPlane: 4m0s</span><br><span class="line">apiVersion: kubeadm.k8s.io/v1beta1</span><br><span class="line">certificatesDir: /etc/kubernetes/pki</span><br><span class="line">clusterName: kubernetes</span><br><span class="line">controlPlaneEndpoint: &quot;&quot;</span><br><span class="line">controllerManager: &#123;&#125;</span><br><span class="line">dns:</span><br><span class="line">  type: CoreDNS</span><br><span class="line">etcd:</span><br><span class="line">  local:</span><br><span class="line">    dataDir: /var/lib/etcd</span><br><span class="line">imageRepository: registry.aliyuncs.com/google_containers</span><br><span class="line">kind: ClusterConfiguration</span><br><span class="line">kubernetesVersion: v1.13.0</span><br><span class="line">networking:</span><br><span class="line">  dnsDomain: cluster.local</span><br><span class="line">  podSubnet: &quot;&quot;</span><br><span class="line">  serviceSubnet: 10.96.0.0/12</span><br><span class="line">scheduler: &#123;&#125;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>使用新配置加载镜像</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kubeadm config images pull --config kubeadm.conf</span><br></pre></td></tr></table></figure>
+<li><p>提前加载镜像</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kubeadm config images pull --image-repository=registry.aliyuncs.com/google_containers</span><br></pre></td></tr></table></figure>
 </li>
 <li><p>安装 <code>k8s</code></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kubeadm init --config kubeadm.conf</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>–pod-network-cidr=10.244.0.0/16 是因为后面要使用 Flannel 网络</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kubeadm init --image-repository=registry.aliyuncs.com/google_containers --pod-network-cidr=10.244.0.0/16</span><br></pre></td></tr></table></figure>
+<p><code>init</code> 如果顺利完成，会提示执行几行命令</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">mkdir -p $HOME/.kube</span><br><span class="line">sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config</span><br><span class="line">sudo chown $(id -u):$(id -g) $HOME/.kube/config</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>安装<code>Flannel</code>网络</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/a70459be0084506e4ec919aa1c114638878db11b/Documentation/kube-flannel.yml</span><br></pre></td></tr></table></figure>
+<p>通过 <code>kubectl get pods --all-namespaces</code> 检查是否已经全部为 <code>Running</code> 状态</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost k8s]# kubectl get pods --all-namespaces</span><br><span class="line">NAMESPACE     NAME                                         READY   STATUS    RESTARTS   AGE</span><br><span class="line">kube-system   coredns-78d4cf999f-677l2                     1/1     Running   0          5m7s</span><br><span class="line">kube-system   coredns-78d4cf999f-c6wng                     1/1     Running   0          5m7s</span><br><span class="line">kube-system   etcd-localhost                               1/1     Running   0          4m40s</span><br><span class="line">kube-system   kube-apiserver-localhost                     1/1     Running   0          4m26s</span><br><span class="line">kube-system   kube-controller-manager-localhost            1/1     Running   0          4m40s</span><br><span class="line">kube-system   kube-flannel-ds-amd64-rl8mq                  1/1     Running   0          26s</span><br><span class="line">kube-system   kube-proxy-lzb5p                             1/1     Running   0          5m7s</span><br><span class="line">kube-system   kube-scheduler-localhost                     1/1     Running   0          4m39s</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>配置master结点也可以分配 <code>pods</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kubectl taint nodes --all node-role.kubernetes.io/master-</span><br></pre></td></tr></table></figure>
 </li>
 </ul>
 </li>
-</ul>
+<li><p>添加 node 节点<br>请参考官网</p>
 </li>
 </ul>
 
