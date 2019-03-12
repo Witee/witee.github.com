@@ -131,6 +131,66 @@
       <div class="body-wrap">
         
   
+    <article id="post-CSS-hover-时显示其它元素" class="article article-type-post" itemscope="" itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/03/13/CSS-hover-时显示其它元素/">CSS hover 时显示其它元素</a>
+    </h1>
+  
+
+        <a href="/2019/03/13/CSS-hover-时显示其它元素/" class="archive-article-date">
+  	<time datetime="2019-03-12T23:19:57.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-03-13</time>
+</a>
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><code>React</code>中经常会用到一个功能，就是鼠标悬停在某一元素上时显示另外一个元素，或子元素、或兄弟元素。</p>
+<p><code>React</code>可以使用<code>state</code>的值控制是否显示，另外还可以使用<code>CSS</code>选择器实现。</p>
+<p>有如下两个<code>div</code>:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;div className=&quot;cls1&quot;&gt;div1&lt;/div&gt;</span><br><span class="line">&lt;div className=&quot;cls2&quot;&gt;div2&lt;/div&gt;</span><br><span class="line">&lt;div className=&quot;cls3&quot;&gt;div3&lt;/div&gt;</span><br></pre></td></tr></table></figure>
+<p>对应的<code>CSS</code>为:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">.cls2 &#123;</span><br><span class="line">  display: none; // div2 默认不显示</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">.cls1:hover+.cls2 &#123;</span><br><span class="line">  display: inline-block;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>关键就是第二行的选择器配置，鼠标放在<code>div1</code>上时，就是显示兄弟元素中<code>class</code>为<code>cls2</code>的元素。<br>另外兄弟选择器(<code>+</code>)还可以换成子元素选择器(<code>&gt;</code>)，这样就可以显示<code>div1</code>下的元素了。</p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags"></i>
+		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/CSS/">CSS</a></li></ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2019/03/13/CSS-hover-时显示其它元素/#more">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+
+
+
+
+
+
+
+  
     <article id="post-centos7使用privoxy配合shadowsocks翻墙" class="article article-type-post" itemscope="" itemprop="blogPost">
   <div class="article-inner">
     
@@ -828,96 +888,6 @@
       
         <p class="article-more-link">
           <a class="article-more-a" href="/2019/01/23/elasticsearch创建mapping/#more">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-
-
-
-
-
-
-
-  
-    <article id="post-elasticsearch常用命令" class="article article-type-post" itemscope="" itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/01/23/elasticsearch常用命令/">elasticsearch 常用命令</a>
-    </h1>
-  
-
-        <a href="/2019/01/23/elasticsearch常用命令/" class="archive-article-date">
-  	<time datetime="2019-01-23T06:46:39.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-01-23</time>
-</a>
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <blockquote>
-<p>以下查询样例均在 <code>ES 5.6.1</code> 版本进行</p>
-</blockquote>
-<ul>
-<li><p>下载样例数据</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">https://github.com/Witee/statics/blob/master/blog/elasticsearch/example-data/accounts.json</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>写入 ES</p>
-<blockquote>
-<p>自动创建了索引 <code>bank</code>，类型 <code>account</code>，使用<code>bulk</code>接口批量操作</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -XPOST &apos;localhost:9200/bank/account/_bulk?pretty&apos; --data-binary  @accounts.json</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>查看索引</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl &apos;localhost:9200/_cat/indices?v&apos;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>普通查询</p>
-<blockquote>
-<ul>
-<li>匹配所有；</li>
-<li>按 <code>account_number</code> 升序；</li>
-<li>从第 3 条记录开始（注意这里的 <code>from</code> 不表示页码）；</li>
-<li>每页显示 2 条；</li>
-</ul>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  &quot;query&quot;: &#123;</span><br><span class="line">    &quot;match_all&quot;: &#123;&#125;</span><br><span class="line">  &#125;,</span><br><span class="line">  &quot;sort&quot;: &#123;</span><br><span class="line">    &quot;account_number&quot;: &#123;&quot;order&quot;: &quot;asc&quot;&#125;</span><br><span class="line">  &#125;,</span><br><span class="line">  &quot;from&quot;: 3,</span><br><span class="line">  &quot;size&quot;: 2</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p><code>sort</code> 可以写多条</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&quot;sort&quot;: [</span><br><span class="line">  &#123;&quot;balance&quot;: &#123;&quot;order&quot;: &quot;desc&quot;&#125; &#125;,</span><br><span class="line">  &#123;&quot;account_number&quot;: &#123;&quot;order&quot;: &quot;asc&quot;&#125; &#125;</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
-<p><code>_source</code> 中指定返回字段</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&quot;_source&quot;: [&quot;account_number&quot;, &quot;balance&quot;]</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-<blockquote>
-<p><code>match</code> 会对查询关键词先进行分词，再查询</p>
-</blockquote>
-<p>  <code>address</code> 包含 <code>mill</code> 或 <code>lane</code>，不区分大小写<br>  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  &quot;query&quot;: &#123; &quot;match&quot;: &#123; &quot;address&quot;: &quot;mill lane&quot; &#125; &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>  <code>address</code> 包含 <code>mill</code> 且 <code>lane</code>，不区分大小写<br>  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  &quot;query&quot;: &#123; &quot;match_phrase&quot;: &#123; &quot;address&quot;: &quot;mill lane&quot; &#125; &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags"></i>
-		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/elasticsearch/">elasticsearch</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/es/">es</a></li></ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2019/01/23/elasticsearch常用命令/#more">展开全文 >></a>
         </p>
       
 
