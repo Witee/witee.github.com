@@ -131,6 +131,76 @@
       <div class="body-wrap">
         
   
+    <article id="post-elasticsearch创建mapping" class="article article-type-post" itemscope="" itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/01/23/elasticsearch创建mapping/">elasticsearch 创建 mapping</a>
+    </h1>
+  
+
+        <a href="/2019/01/23/elasticsearch创建mapping/" class="archive-article-date">
+  	<time datetime="2019-01-23T09:26:20.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-01-23</time>
+</a>
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <ul>
+<li><p>查看当前ES中有哪些索引</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[GET] http://localhost:9200/_cat/indices</span><br><span class="line"></span><br><span class="line">返回:</span><br><span class="line">  &#123;</span><br><span class="line">      &quot;acknowledged&quot;: true,</span><br><span class="line">      &quot;shards_acknowledged&quot;: true,</span><br><span class="line">      &quot;index&quot;: &quot;inde_name&quot;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>创建索引（index）（mysql-库）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[PUT] http://localhost:9200/inde_name</span><br><span class="line"></span><br><span class="line">返回:</span><br><span class="line">  &#123;</span><br><span class="line">      &quot;acknowledged&quot;: true,</span><br><span class="line">      &quot;shards_acknowledged&quot;: true,</span><br><span class="line">      &quot;index&quot;: &quot;inde_name&quot;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>查看索引</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[GET] http://localhost:9200/inde_name/_mapping</span><br><span class="line"></span><br><span class="line">返回:</span><br><span class="line">  &#123;</span><br><span class="line">      &quot;inde_name&quot;: &#123;</span><br><span class="line">          &quot;mappings&quot;: &#123;&#125;</span><br><span class="line">      &#125;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>创建类型（type）（mysql-表）的同时创建创建映射（mapping）（mysql-字段）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line">[POST] http://localhost:9200/inde_name/_mapping/fans</span><br><span class="line"></span><br><span class="line">body:</span><br><span class="line">  &#123;</span><br><span class="line">      &quot;dynamic&quot;: &quot;false&quot;,</span><br><span class="line">      &quot;_all&quot;: &#123;</span><br><span class="line">          &quot;enabled&quot;: false</span><br><span class="line">      &#125;,</span><br><span class="line">      &quot;_parent&quot;: &#123;</span><br><span class="line">          &quot;type&quot;: &quot;kol&quot;</span><br><span class="line">      &#125;,</span><br><span class="line">      &quot;_routing&quot;: &#123;</span><br><span class="line">          &quot;required&quot;: true</span><br><span class="line">      &#125;,</span><br><span class="line">      &quot;properties&quot;: &#123;</span><br><span class="line">          &quot;fansAge&quot;: &#123;</span><br><span class="line">              &quot;type&quot;: &quot;integer&quot;</span><br><span class="line">          &#125;,</span><br><span class="line">          &quot;fansCity&quot;: &#123;</span><br><span class="line">              &quot;type&quot;: &quot;keyword&quot;</span><br><span class="line">          &#125;,</span><br><span class="line">          &quot;fansCityLevel&quot;: &#123;</span><br><span class="line">              &quot;type&quot;: &quot;integer&quot;</span><br><span class="line">          &#125;,</span><br><span class="line">          &quot;fansGender&quot;: &#123;</span><br><span class="line">              &quot;type&quot;: &quot;integer&quot;</span><br><span class="line">          &#125;,</span><br><span class="line">          &quot;fansInterests&quot;: &#123;</span><br><span class="line">              &quot;type&quot;: &quot;keyword&quot;</span><br><span class="line">          &#125;,</span><br><span class="line">          &quot;fansKolUid&quot;: &#123;</span><br><span class="line">              &quot;type&quot;: &quot;keyword&quot;</span><br><span class="line">          &#125;,</span><br><span class="line">          &quot;fansLocation&quot;: &#123;</span><br><span class="line">              &quot;type&quot;: &quot;keyword&quot;</span><br><span class="line">          &#125;,</span><br><span class="line">          &quot;fansProvince&quot;: &#123;</span><br><span class="line">              &quot;type&quot;: &quot;keyword&quot;</span><br><span class="line">          &#125;,</span><br><span class="line">          &quot;fansUid&quot;: &#123;</span><br><span class="line">              &quot;type&quot;: &quot;keyword&quot;</span><br><span class="line">          &#125;</span><br><span class="line">      &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">返回:</span><br><span class="line">  &#123;</span><br><span class="line">      &quot;acknowledged&quot;: true,</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>再次查看索引</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line">[GET] http://localhost:9200/inde_name/_mapping</span><br><span class="line"></span><br><span class="line">返回:</span><br><span class="line">  &#123;</span><br><span class="line">      &quot;inde_name&quot;: &#123;</span><br><span class="line">          &quot;mappings&quot;: &#123;</span><br><span class="line">              &quot;fans&quot;: &#123;</span><br><span class="line">                  &quot;dynamic&quot;: &quot;false&quot;,</span><br><span class="line">                  &quot;_all&quot;: &#123;</span><br><span class="line">                      &quot;enabled&quot;: false</span><br><span class="line">                  &#125;,</span><br><span class="line">                  &quot;_parent&quot;: &#123;</span><br><span class="line">                      &quot;type&quot;: &quot;kol&quot;</span><br><span class="line">                  &#125;,</span><br><span class="line">                  &quot;_routing&quot;: &#123;</span><br><span class="line">                      &quot;required&quot;: true</span><br><span class="line">                  &#125;,</span><br><span class="line">                  &quot;properties&quot;: &#123;</span><br><span class="line">                      &quot;fansAge&quot;: &#123;</span><br><span class="line">                          &quot;type&quot;: &quot;integer&quot;</span><br><span class="line">                      &#125;,</span><br><span class="line">                      &quot;fansCity&quot;: &#123;</span><br><span class="line">                          &quot;type&quot;: &quot;keyword&quot;</span><br><span class="line">                      &#125;,</span><br><span class="line">                      &quot;fansCityLevel&quot;: &#123;</span><br><span class="line">                          &quot;type&quot;: &quot;integer&quot;</span><br><span class="line">                      &#125;,</span><br><span class="line">                      &quot;fansGender&quot;: &#123;</span><br><span class="line">                          &quot;type&quot;: &quot;integer&quot;</span><br><span class="line">                      &#125;,</span><br><span class="line">                      &quot;fansInterests&quot;: &#123;</span><br><span class="line">                          &quot;type&quot;: &quot;keyword&quot;</span><br><span class="line">                      &#125;,</span><br><span class="line">                      &quot;fansKolUid&quot;: &#123;</span><br><span class="line">                          &quot;type&quot;: &quot;keyword&quot;</span><br><span class="line">                      &#125;,</span><br><span class="line">                      &quot;fansLocation&quot;: &#123;</span><br><span class="line">                          &quot;type&quot;: &quot;keyword&quot;</span><br><span class="line">                      &#125;,</span><br><span class="line">                      &quot;fansProvince&quot;: &#123;</span><br><span class="line">                          &quot;type&quot;: &quot;keyword&quot;</span><br><span class="line">                      &#125;,</span><br><span class="line">                      &quot;fansUid&quot;: &#123;</span><br><span class="line">                          &quot;type&quot;: &quot;keyword&quot;</span><br><span class="line">                      &#125;</span><br><span class="line">                  &#125;</span><br><span class="line">              &#125;</span><br><span class="line">          &#125;</span><br><span class="line">      &#125;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags"></i>
+		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/elasticsearch/">elasticsearch</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/es/">es</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mapping/">mapping</a></li></ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2019/01/23/elasticsearch创建mapping/#more">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+
+
+
+
+
+
+
+  
     <article id="post-elasticsearch常用命令" class="article article-type-post" itemscope="" itemprop="blogPost">
   <div class="article-inner">
     
@@ -911,63 +981,9 @@
 
 
   
-    <article id="post-新的开始" class="article article-type-post" itemscope="" itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2016/11/30/新的开始/">新的开始</a>
-    </h1>
-  
-
-        <a href="/2016/11/30/新的开始/" class="archive-article-date">
-  	<time datetime="2016-11-30T05:38:58.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2016-11-30</time>
-</a>
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>可以在 github 中写博客了！</p>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags"></i>
-		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/blog/">blog</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/github/">github</a></li></ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2016/11/30/新的开始/#more">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-
-
-
-
-
-
-
-  
   
     <nav id="page-nav">
-      <a class="extend prev" rel="prev" href="/">&laquo; Prev</a><a class="page-number" href="/">1</a><span class="page-number current">2</span>
+      <a class="extend prev" rel="prev" href="/">&laquo; Prev</a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><a class="extend next" rel="next" href="/page/3/">Next &raquo;</a>
     </nav>
   
 
